@@ -16,6 +16,18 @@ do
     local COMMAND_TARGET_SINGLE = "local"
     local COMMAND_TARGET_ALL    = "all"
 
+    local OPTION_WHITELIST = "whitelist"
+    local OPTION_WHITELIST_USERGROUP = "usergroup"
+    local OPTION_WHITELIST_STEAMID   = "steamid"
+    local OPTION_WHITELIST_STEAMID64 = "steamid64"
+    local OPTION_WHITELIST_TEAM  = "team"
+
+    local OPTION_PREFIX    = "prefix"
+    local OPTION_EXECUTE   = "execute"
+    local OPTION_PLAYER    = "player"
+    local OPTION_SHOWCOMMAND = "showCommand"
+    local OPTION_PREEXECUTE = "preExecute"
+
     local function isValidCommandName( toValid )
 
         if ( toValid == nil or not isString( toValid) ) then
@@ -36,24 +48,24 @@ do
         end
         
         -- Essential options
-        if ( toValid['prefix'] == nil or not 
-             isString( toValid['prefix'] ) ) then
+        if ( toValid[ OPTION_PREFIX ] == nil or not 
+             isString( toValid[ OPTION_PREFIX ] ) ) then
             return false
         end
-        if ( toValid['execute'] == nil or not
-             isFunction( toValid['execute'] ) ) then
+        if ( toValid[ OPTION_EXECUTE ] == nil or not
+             isFunction( toValid[ OPTION_EXECUTE ] ) ) then
             return false
         end
-        if ( toValid['player'] == nil or not
-             isString( toValid['player'] ) ) then
+        if ( toValid[ OPTION_PLAYER ] == nil or not
+             isString( toValid[ OPTION_PLAYER ] ) ) then
             return false
         end
-        if ( toValid['player'] ~= COMMAND_TARGET_SINGLE and
-             toValid['player'] ~= COMMAND_TARGET_ALL ) then
+        if ( toValid[ OPTION_PLAYER ] ~= COMMAND_TARGET_SINGLE and
+             toValid[ OPTION_PLAYER ] ~= COMMAND_TARGET_ALL ) then
             return false
         end
-        if ( toValid['showCommand'] == nil or not 
-             isBool( toValid['showCommand'] ) ) then
+        if ( toValid[ OPTION_SHOWCOMMAND ] == nil or not 
+             isBool( toValid[ OPTION_SHOWCOMMAND ] ) ) then
             return false
         end
 
@@ -79,12 +91,12 @@ do
             return 
         end
 
-        if ( not options['whitelist'] or not isTable( options['whitelist'] ) ) then
-            options['whitelist'] = {
-                ["usergroup"] = {},
-                ["steamid"] = {},
-                ["steamid64"] = {},
-                ["team"] = {}
+        if ( not options[ OPTION_WHITELIST ] or not isTable( options[ OPTION_WHITELIST ] ) ) then
+            options[ OPTION_WHITELIST ] = {
+                [ OPTION_WHITELIST_USERGROUP ] = {},
+                [ OPTION_WHITELIST_STEAMID ]   = {},
+                [ OPTION_WHITELIST_STEAMID64 ] = {},
+                [ OPTION_WHITELIST_TEAM ] = {}
             }
         end
 
@@ -106,9 +118,9 @@ do
         local preExecute = function()
             base()
 
-            if ( self.options["preExecute"] and 
-                isFunction( self.options["preExecute"] ) ) then
-                return self.options["preExecute"]( requester )
+            if ( self.options[ OPTION_PREEXECUTE ] and 
+                isFunction( self.options[ OPTION_PREEXECUTE ] ) ) then
+                return self.options[ OPTION_PREEXECUTE ]( requester )
             else 
                 return nil
             end
@@ -120,7 +132,7 @@ do
     function chatCommand:execute( requester, commandOptions )
         local preExecute = { self:preExecute( requester, commandOptions ) }
 
-        local execute = self.options["execute"]
+        local execute = self.options[ OPTION_EXECUTE ]
         execute( requester, commandOptions, preExecute )
 
         self:postExecute( requester, commandOptions )
@@ -136,10 +148,10 @@ do
         return tableCopy( self.options )
     end
     function chatCommand:getPrefix()
-        return self:getOptions()['prefix']
+        return self:getOptions()[ OPTION_PREFIX ]
     end
     function chatCommand:getRestricted()
-        return tableCopy( self:getOptions()['whitelist'] )
+        return tableCopy( self:getOptions()[ OPTION_WHITELIST ] )
     end
 
     setmetatable( chatCommand, {__call = chatCommand.new } )
