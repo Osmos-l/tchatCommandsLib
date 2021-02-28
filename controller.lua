@@ -5,6 +5,9 @@ local strExplode = string.Explode
 local tableCopy = table.Copy
 local tableRemove = table.remove
 
+local isString = isstring
+local isTable = istable
+
 local commands = commands or {}
 
 local function registerCommand( name, options )
@@ -14,10 +17,10 @@ local function registerCommand( name, options )
         if ( not commands[name] ) then
             commands[name] = command
             return true
-        else
-            // TODO: throw error
         end
     end
+
+    // TODO: Delete command
 
     return false
 end
@@ -28,34 +31,71 @@ end
 local function getCommand( commandName )
     return tableCopy( commands[ commandName ] )
 end
+local function comparePrefix( toCompare1, toCompare2 )
+    local equal = false
+
+    if ( isTable( toCompare2 ) ) then
+        for k, v in ipairs( toCompare2 ) do
+            if ( v == toCompare1 ) then
+                equal = true
+            end
+        end
+    else
+        equal = toCompare1 == toCompare2
+    end
+
+    return equal
+end
+local function checkRestriction( ply, restriction )
+    local restricted = true
+
+    for _, type in pairs( restriction ) do
+        for v, __ in pairs( restriction ) do
+            local toCompare
+
+            if ( type == "usergroup" ) then
+                toCompare = ply:GetUserGroup()
+            elseif ( type == "steamid" ) then
+                toCompare = ply:SteamID()
+            elseif ( type == "steamid64" ) then
+                toCompare = ply:SteamID64()
+            elseif ( type == "team" ) then
+                toCompare = ply:Team()
+            end
+
+            if ( toCompare == v ) then
+                restricted = false
+                break
+            end
+        end
+    end
+
+    return restricted
+end
 
 local function executeCommand( text, ply )
-    if ( text == nil or not isstring( text ) ) then
+    if ( text == nil or not isString( text ) ) then
         return
     end
     if ( ply == nil or not ply:IsPlayer() ) then
         return
     end
 
-    local prefix = text[1]
-    text = setChar( text, 1, '' )
-    
+    local commandPrefix = text[1]
+
+    text = setChar( text, 1, '' ) // Command with options
     text = strExplode( ' ', text )
+
     local commandName = toLower( text[1] )
     local commandOptions = tableRemove( text, 1 )
 
     if ( existCommandName( commandName ) ) then 
         local command = getCommand( commandName )
 
-        // TODO: compare prefix
-        if ( prefix == command:getPrefix() ) then
-            print( "execute command" )
-            command:execute( ply )
-        else
-            print( "not same prefix" )
+        if ( comparePrefix( commandPrefix, command:getPrefix()
+             and checkRestriction( ply, command:getRestricted() ) ) ) then
+            command:execute( ply, commandOptions )
         end
-    else
-        print( "invalid command name" )
     end
 
     return
@@ -66,31 +106,24 @@ hook.Add( "OnPlayerChat", "OnPlayerChat:CommandsLib", function( ply, text )
 end)
 
 local isValid = registerCommand( "test", {
-    ["prefix"] = "!", // TODO: array
-    ["restricted"] = {
-        ["usergroup"] = {
-        },
-        ["steamid"] = {
-
-        },
-        ["steamid64"] = {
-
-        },
-        ["team"] = {
-
-        }
+    ["prefix"] = { "/", "!" }, // TODO: ""
+    ["whitelist"] = {
+        ["usergroup"]   = {},
+        ["steamid"]     = {},
+        ["steamid64"]   = {},
+        ["team"]        = {}
     },
-    ["preExecute"] = function()
+    ["preExecute"] = function( requester, options )
         local a, b, c = 1, 2, 3
 
-        return a, b, c
+        return a, b, c, requester:Name()
     end,
-    ["execute"] = function( options, preExecute )
+    ["execute"] = function( requester, options, preExecute )
         print( options )
         PrintTable( preExecute )
         chat.AddText( Color( 255, 0, 0 ), "HELLO WORLD" )
     end,
-    ["postExecute"] = function()
+    ["postExecute"] = function( requester, options )
 
     end,
     ["player"] = "local", // or "all",

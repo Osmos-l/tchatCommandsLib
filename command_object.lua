@@ -1,4 +1,11 @@
+local isString = isstring
+local isFunction = isfunction
+local isTable = istable
+local isBool = isbool
+local tableCopy = table.Copy
+
 do
+
     chatCommand = {}
     chatCommand.__index = chatCommand
 
@@ -11,7 +18,7 @@ do
 
     local function isValidCommandName( toValid )
 
-        if ( toValid == nil or not isstring( toValid) ) then
+        if ( toValid == nil or not isString( toValid) ) then
             return false
         end
 
@@ -24,21 +31,21 @@ do
 
     local function isValidCommandOptions( toValid )
         
-        if ( toValid == nil or not istable( toValid ) ) then
+        if ( toValid == nil or not isTable( toValid ) ) then
             return false
         end
         
         -- Essential options
         if ( toValid['prefix'] == nil or not 
-             isstring( toValid['prefix'] ) ) then
+             isString( toValid['prefix'] ) ) then
             return false
         end
         if ( toValid['execute'] == nil or not
-             isfunction( toValid['execute'] ) ) then
+             isFunction( toValid['execute'] ) ) then
             return false
         end
         if ( toValid['player'] == nil or not
-             isstring( toValid['player'] ) ) then
+             isString( toValid['player'] ) ) then
             return false
         end
         if ( toValid['player'] ~= COMMAND_TARGET_SINGLE and
@@ -46,7 +53,7 @@ do
             return false
         end
         if ( toValid['showCommand'] == nil or not 
-             isbool( toValid['showCommand'] ) ) then
+             isBool( toValid['showCommand'] ) ) then
             return false
         end
 
@@ -72,6 +79,15 @@ do
             return 
         end
 
+        if ( not options['whitelist'] or not isTable( options['whitelist'] ) ) then
+            options['whitelist'] = {
+                ["usergroup"] = {},
+                ["steamid"] = {},
+                ["steamid64"] = {},
+                ["team"] = {}
+            }
+        end
+
         local command = {
             name = name,
             options = options
@@ -82,26 +98,32 @@ do
         return command
     end
     
-    function chatCommand:preExecute()
-        local preExecute = function()
-            return nil
+    function chatCommand:preExecute( requester )
+        local base = function()
+            // LIKE if client and requester ~= LocalPlayer() then return end
         end
 
-        if ( self.options["preExecute"] and 
-             isfunction( self.options["preExecute"] ) ) then
-            preExecute = self.options["preExecute"]
+        local preExecute = function()
+            base()
+
+            if ( self.options["preExecute"] and 
+                isFunction( self.options["preExecute"] ) ) then
+                return self.options["preExecute"]( requester )
+            else 
+                return nil
+            end
         end
 
         return preExecute()
     end
 
-    function chatCommand:execute()
-        local preExecute = { self:preExecute() }
+    function chatCommand:execute( requester, commandOptions )
+        local preExecute = { self:preExecute( requester, commandOptions ) }
 
         local execute = self.options["execute"]
-        execute( "STUB", preExecute )
+        execute( requester, commandOptions, preExecute )
 
-        self:postExecute()
+        self:postExecute( requester, commandOptions )
     end
 
     function chatCommand:postExecute()
@@ -111,10 +133,13 @@ do
         return self.name
     end
     function chatCommand:getOptions()
-        return self.options
+        return tableCopy( self.options )
     end
     function chatCommand:getPrefix()
         return self:getOptions()['prefix']
+    end
+    function chatCommand:getRestricted()
+        return tableCopy( self:getOptions()['whitelist'] )
     end
 
     setmetatable( chatCommand, {__call = chatCommand.new } )
