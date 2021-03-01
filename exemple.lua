@@ -1,14 +1,14 @@
 local isValid =  commandsLib.register( "random", {
     ["prefix"] = { "/", "!" },
-    ["whitelist"] = {
+    ["whitelist"] = { -- Optional
         ["usergroup"]   = {},
         ["steamid"]     = {},
         ["steamid64"]   = {},
         ["team"]        = {}
     },
-    ["preExecute"] = function( requester, options )
+    ["preExecute"] = function( requester, options ) -- Optional
         local randomNumber
-        if ( options and options[1] and options[2] ) then // requester say : '!random option[1] option[2]' => '!random 50 100'
+        if ( options and options[1] and options[2] ) then
             randomNumber = math.Rand( tonumber( options[1] ), 
                                         tonumber( options[2] ) )
         else
@@ -24,7 +24,7 @@ local isValid =  commandsLib.register( "random", {
                       Color( 255, 255, 255 ), " random number is ",
                       Color( 0, 0, 0 ), randomNumber )
     end,
-    ["postExecute"] = function( requester, options )
+    ["postExecute"] = function( requester, options ) -- Optional
         ServerLog( requester:Name() " say used random command" )
     end,
     ["player"] = "local",
@@ -36,3 +36,9 @@ if ( isValid ) then
 else
     print( "Error, a command does already have this name !" )
 end
+
+-- Exemple
+--
+-- input => !random 50 100
+-- output => x random number is y
+-- 
