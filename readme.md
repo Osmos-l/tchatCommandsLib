@@ -1,7 +1,8 @@
 # commandsLib
 
-commandsLib is a gLua library for tchat commands in Garry's mod.
-
+commandsLib is a gLua library for commands chat in Garry's mod.
+I'm actually work in, only client side commands work.
+You can contribute for sure :)
 
 
 ## Usage
@@ -9,8 +10,8 @@ commandsLib is a gLua library for tchat commands in Garry's mod.
 ```lua
 local isValid =  commandsLib.register( "hello", {
     ["prefix"] = { "/", "!" },
-    ["execute"] = function( requester, options)
-       chat.AddText( Color( 255, 0, 0), "HELLO WORLD" )
+    ["execute"] = function( requester, options )
+       chat.AddText( Color( 255, 0, 0), "Hi " .. requester:Name() )
     end,
     ["player"] = "local",
     ["showCommand"] = false
