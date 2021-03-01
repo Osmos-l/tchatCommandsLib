@@ -10,7 +10,9 @@ local isTable = istable
 
 local commands = commands or {}
 
-local function registerCommand( name, options )
+commandsLib = commandsLib or {}
+
+function commandsLib.register( name, options )
 
     local command = chatCommand( name, options )
     if ( command ) then
@@ -35,15 +37,19 @@ local function comparePrefix( toCompare1, toCompare2 )
     local equal = false
 
     if ( isTable( toCompare2 ) ) then
+        print( "is table" )
+        PrintTable( toCompare2 )
         for k, v in ipairs( toCompare2 ) do
+            print( v, toCompare1 )
             if ( v == toCompare1 ) then
                 equal = true
             end
         end
     else
+        print( "is not table" )
         equal = toCompare1 == toCompare2
     end
-
+    print( "prefix = ", equal )
     return equal
 end
 local function checkRestriction( ply, restriction )
@@ -64,6 +70,7 @@ local function checkRestriction( ply, restriction )
             end
 
             if ( toCompare == v ) then
+                print( "unvalid restriction" )
                 restricted = false
                 break
             end
@@ -75,9 +82,11 @@ end
 
 local function executeCommand( text, ply )
     if ( text == nil or not isString( text ) ) then
+        print( "invalid text" )
         return
     end
     if ( ply == nil or not ply:IsPlayer() ) then
+        print( "invalid speaker" )
         return
     end
 
@@ -87,50 +96,31 @@ local function executeCommand( text, ply )
     text = strExplode( ' ', text )
 
     local commandName = toLower( text[1] )
-    local commandOptions = tableRemove( text, 1 )
+
+    local commmandOptions = false
+    if ( #text > 1 ) then
+        commandOptions = tableRemove( text, 1 )
+    end
 
     if ( existCommandName( commandName ) ) then 
         local command = getCommand( commandName )
 
-        if ( comparePrefix( commandPrefix, command:getPrefix()
-             and checkRestriction( ply, command:getRestricted() ) ) ) then
+        if ( comparePrefix( commandPrefix, command:getPrefix() )
+             and checkRestriction( ply, command:getRestricted() ) ) then
             command:execute( ply, commandOptions )
+        else 
+            print( "unvalid prefix or restriction" )
         end
+    else
+        print( "unvalid command name")
     end
 
     return
 end
 
+// TODO: distinction for sv and cl hook
 hook.Add( "OnPlayerChat", "OnPlayerChat:CommandsLib", function( ply, text )
+    print( "someone speak" )
     return executeCommand( text, ply )
 end)
 
-local isValid = registerCommand( "test", {
-    ["prefix"] = { "/", "!" }, // TODO: ""
-    ["whitelist"] = {
-        ["usergroup"]   = {},
-        ["steamid"]     = {},
-        ["steamid64"]   = {},
-        ["team"]        = {}
-    },
-    ["preExecute"] = function( requester, options )
-        local a, b, c = 1, 2, 3
-
-        return a, b, c, requester:Name()
-    end,
-    ["execute"] = function( requester, options, preExecute )
-        print( options )
-        PrintTable( preExecute )
-        chat.AddText( Color( 255, 0, 0 ), "HELLO WORLD" )
-    end,
-    ["postExecute"] = function( requester, options )
-
-    end,
-    ["player"] = "local", // or "all",
-    ["showCommand"] = false
-} )
-if ( isValid ) then
-    print( "Congratulations, you have created a new chat command!" )
-else
-    print( "Error, a command does already have this name !" )
-end
