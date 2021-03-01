@@ -44,28 +44,34 @@ do
     local function isValidCommandOptions( toValid )
         
         if ( toValid == nil or not isTable( toValid ) ) then
+            print( 0 )
             return false
         end
         
         -- Essential options
         if ( toValid[ OPTION_PREFIX ] == nil or not 
-             isString( toValid[ OPTION_PREFIX ] ) ) then
+             isTable( toValid[ OPTION_PREFIX ] ) ) then
+            print( 1 )
             return false
         end
         if ( toValid[ OPTION_EXECUTE ] == nil or not
              isFunction( toValid[ OPTION_EXECUTE ] ) ) then
+                print( 2 )
             return false
         end
         if ( toValid[ OPTION_PLAYER ] == nil or not
              isString( toValid[ OPTION_PLAYER ] ) ) then
+                print( 3 )
             return false
         end
         if ( toValid[ OPTION_PLAYER ] ~= COMMAND_TARGET_SINGLE and
              toValid[ OPTION_PLAYER ] ~= COMMAND_TARGET_ALL ) then
+                print( 4 )
             return false
         end
         if ( toValid[ OPTION_SHOWCOMMAND ] == nil or not 
              isBool( toValid[ OPTION_SHOWCOMMAND ] ) ) then
+                print( 5 )
             return false
         end
 
