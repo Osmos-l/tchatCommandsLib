@@ -22,8 +22,8 @@ local isValid =  commandsLib.register( "hello", {
 
 More exemples:
 
-- [Client](https://github.com/Osmos-l/tchatCommandsLib/blob/main/lua/autorun/client/exemple.lua)
-- [Server](https://github.com/Osmos-l/tchatCommandsLib/blob/main/lua/autorun/server/exemple.lua)
+- [Client](https://github.com/Osmos-l/tchatCommandsLib/blob/main/lua/autorun/client)
+- [Server](https://github.com/Osmos-l/tchatCommandsLib/blob/main/lua/autorun/server)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
