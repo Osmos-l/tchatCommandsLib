@@ -18,6 +18,7 @@ function commandsLib.register( name, options )
     local command = chatCommand( name, options )
     if ( command ) then
         if ( not commands[name] ) then
+            -- TODO: Optimize stockage
             commands[name] = command
             return true
         end
@@ -97,18 +98,20 @@ local function executeCommand( text, ply )
 
     local commandPrefix = text[1]
 
-    text = setChar( text, 1, '' ) // Command with options
-    text = strExplode( ' ', text )
+    text = setChar( text, 1, '' ) -- Remove prefix
+
+    -- TODO: Add options separator configuration
+    text = strExplode( ' ', text ) -- Explode to get command name and options
 
     local commandName = toLower( text[1] )
 
-    local commmandOptions = false
-    if ( #text > 1 ) then
-        commandOptions = tableRemove( text, 1 )
-    end
-
     if ( existCommandName( commandName ) ) then 
         local command = getCommand( commandName )
+
+        local commmandOptions = false
+        if ( #text > 1 ) then
+            commandOptions = tableRemove( text, 1 )
+        end
 
         if ( comparePrefix( commandPrefix, command:getPrefix() )
              and not checkRestriction( ply, command:getRestricted() ) ) then
