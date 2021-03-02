@@ -10,8 +10,6 @@ local isString = isstring
 local isTable = istable
 
 local commands = commands or {}
-local REQUEST_CLIENT = "client"
-local REQUEST_SERVER = "server"
 
 commandsLib = commandsLib or {}
 
