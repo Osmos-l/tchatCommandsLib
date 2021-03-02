@@ -15,7 +15,6 @@ if ( DarkRP ) then
             msg = replace( msg, "{nick}", requester:Nick() )
             msg = replace( msg, "{roll}", roll )
             
-
             if GAMEMODE.Config.alltalk then
                 for _, target in ipairs( player.GetAll() ) do
                     DarkRP.talkToPerson( target, MESSAGE_COLOR, msg )
