@@ -28,6 +28,7 @@ do
     local OPTION_SHOWCOMMAND = "showCommand"
     local OPTION_PREEXECUTE = "preExecute"
     local OPTION_POSTEXECUTE = "postExecute"
+    local OPTION_ONDELETE = "onDelete"
 
     local function isValidCommandName( toValid )
 
@@ -182,6 +183,13 @@ do
         postExecute()
     end
 
+    function chatCommand:OnDelete()
+        local customDelete = self:getOnDelete()
+
+        customDelete()
+
+    end
+
     -- Getters
     function chatCommand:getName()
         return self.name
@@ -198,7 +206,18 @@ do
     function chatCommand:getShowMessage()
         return self:getOptions()[ OPTION_SHOWCOMMAND ]
     end
+    function chatCommand:getOnDelete()
+        local onDelete = function()
+        end
+        
+        local customOnDelete = self:getOptions()[ OPTION_ONDELETE ]
+        
+        if ( customOnDelete and isFunction( customOnDelete ) ) then
+            onDelete = customOnDelete
+        end
 
+        return onDelete
+    end
     if CLIENT then
         function chatCommand:getScope()
             return self:getOptions()[ OPTION_PLAYER ]

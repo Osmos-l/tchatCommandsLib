@@ -10,9 +10,11 @@ local isString = isstring
 local isTable = istable
 
 local commands = commands or {}
-
 commandsLib = commandsLib or {}
 
+--
+-- TODO: Comment method role 
+--
 function commandsLib.register( name, options )
 
     local command = chatCommand( name, options )
@@ -24,9 +26,20 @@ function commandsLib.register( name, options )
         end
     end
 
-    // TODO: Delete command
-
     return false
+end
+
+--
+-- TODO: Comment method role 
+--
+function commandsLib.delete( name )
+    local exist = existCommandName( name )
+    if ( exist ) then
+        local command = getCommand( name )
+
+        commands[ name ] = nil
+        command:OnDelete()
+    end
 end
 
 local function existCommandName( text )
