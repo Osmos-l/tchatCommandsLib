@@ -2,6 +2,7 @@ local replace = string.Replace
 
 local MESSAGE = "no clip turn {state}"
 
+-- Can cause conflict if you already have ULX
 local isValid =  commandsLib.register( "noclip", {
     ["prefix"] = { "/", "!" },
     ["whitelist"] = {
@@ -16,7 +17,7 @@ local isValid =  commandsLib.register( "noclip", {
         local requesterMoveType = requester:GetMoveType()
         
         local requesterDesiredMoveType = requesterMoveType == MOVETYPE_NOCLIP and
-                                            MOVETYPE_NOCLIP or MOVETYPE_WALK
+                                          MOVETYPE_WALK or MOVETYPE_NOCLIP
 
         if ( requesterMoveType ~= MOVETYPE_OBSERVER ) then
             requester:SetMoveType( requesterDesiredMoveType )
