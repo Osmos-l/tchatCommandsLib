@@ -9,11 +9,12 @@ local tableCount = table.Count
 local isString = isstring
 local isTable = istable
 
-include( "./lib/command_object.lua" )
-include( "./lib/command_utils.lua" )
+local utils = include( "./lib/command_utils.lua" )
 
 local commands = commands or {}
 commandsLib = commandsLib or {}
+
+include( "./lib/command_object.lua" )
 
 --
 -- TODO: Comment method role 
@@ -50,21 +51,6 @@ local function existCommandName( text )
 end
 local function getCommand( commandName )
     return tableCopy( commands[ commandName ] )
-end
-local function comparePrefix( toCompare1, toCompare2 )
-    local equal = false
-
-    if ( isTable( toCompare2 ) ) then
-        for k, v in ipairs( toCompare2 ) do
-            if ( v == toCompare1 ) then
-                equal = true
-            end
-        end
-    else
-        equal = toCompare1 == toCompare2
-    end
-
-    return equal
 end
 local function checkRestriction( ply, restriction )
     local restricted = true
@@ -130,7 +116,7 @@ local function executeCommand( text, ply )
             commandOptions = tableRemove( text, 1 )
         end
 
-        if ( comparePrefix( commandPrefix, command:getPrefix() )
+        if ( utils.ComparePrefixes( commandPrefix, command:getPrefix() )
              and not checkRestriction( ply, command:getRestricted() ) ) then
             command:execute( ply, commandOptions )
 
