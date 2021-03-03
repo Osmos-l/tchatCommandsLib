@@ -52,44 +52,6 @@ end
 local function getCommand( commandName )
     return tableCopy( commands[ commandName ] )
 end
-local function checkRestriction( ply, restriction )
-    local restricted = true
-    local probablyEmpty = true
-
-    for type, values in pairs( restriction ) do
-        if ( tableCount( values ) == 0 ) then
-            continue
-        end
-
-        probablyEmpty = false
-
-        for value, __ in pairs( values ) do
-            local toCompare
-
-            -- Todo: Clean
-            if ( type == "usergroup" ) then
-                toCompare = ply:GetUserGroup()
-            elseif ( type == "steamid" ) then
-                toCompare = ply:SteamID()
-            elseif ( type == "steamid64" ) then
-                toCompare = ply:SteamID64()
-            elseif ( type == "team" ) then
-                toCompare = ply:Team()
-            end
-
-            if ( toCompare == value ) then
-                restricted = false
-                break
-            end
-        end
-    end
-
-    if ( probablyEmpty ) then
-        return false
-    end
-
-    return restricted
-end
 
 local function executeCommand( text, ply )
     if ( text == nil or not isString( text ) ) then
@@ -117,7 +79,7 @@ local function executeCommand( text, ply )
         end
 
         if ( utils.ComparePrefixes( commandPrefix, command:getPrefix() )
-             and not checkRestriction( ply, command:getRestricted() ) ) then
+             and not utils.isPlayerRestricted( ply, command:getRestricted() ) ) then
             command:execute( ply, commandOptions )
 
             return not command:getShowMessage()
