@@ -9,6 +9,9 @@ local tableCount = table.Count
 local isString = isstring
 local isTable = istable
 
+include( "./lib/command_object.lua" )
+include( "./lib/command_utils.lua" )
+
 local commands = commands or {}
 commandsLib = commandsLib or {}
 
@@ -77,6 +80,7 @@ local function checkRestriction( ply, restriction )
         for value, __ in pairs( values ) do
             local toCompare
 
+            -- Todo: Clean
             if ( type == "usergroup" ) then
                 toCompare = ply:GetUserGroup()
             elseif ( type == "steamid" ) then

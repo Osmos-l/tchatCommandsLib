@@ -20,7 +20,7 @@ local isValid =  commandsLib.register( "invincible", {
         else
             requester:GodEnable()
         end
-        
+
         local msg = MESSAGE
         msg = replace( msg, "{state}", isInvincible and "off" or "on" )
 
